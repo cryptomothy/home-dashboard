@@ -81,7 +81,7 @@
 </script>
 
 <svelte:head>
-  <title>Cryptomothy's Dashboard</title>
+  <title>Tableau de bord</title>
 </svelte:head>
 
 {#if loading}
