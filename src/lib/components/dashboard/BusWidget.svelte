@@ -13,6 +13,7 @@
   let schedules: Record<string, any> = {};
   let loading = true;
   let error = false;
+  let timeoutError = false;
   let lastUpdated = new Date();
   let currentDirection: 'up' | 'down' = 'up';
 
@@ -83,6 +84,12 @@
     try {
       loading = true;
       error = false;
+      timeoutError = false;
+
+      // Créer une promesse de timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout')), 5000);
+      });
 
       // Charger les horaires pour chaque bus en parallèle
       const schedulePromises = buses.map(async (bus) => {
@@ -103,7 +110,11 @@
         }
       });
 
-      const results = await Promise.all(schedulePromises);
+      // Attendre soit que toutes les promesses soient résolues, soit que le timeout se déclenche
+      const results = (await Promise.race([
+        Promise.all(schedulePromises),
+        timeoutPromise,
+      ])) as any[];
 
       // Mettre à jour les horaires
       schedules = {};
@@ -115,7 +126,11 @@
       lastUpdated = new Date();
     } catch (e) {
       console.error('Erreur lors du chargement des horaires:', e);
-      error = true;
+      if ((e as Error).message === 'Timeout') {
+        timeoutError = true;
+      } else {
+        error = true;
+      }
     } finally {
       setTimeout(() => {
         loading = false;
@@ -130,6 +145,12 @@
     const interval = setInterval(loadSchedule, 180000);
 
     return () => clearInterval(interval); */
+
+    setTimeout(() => {
+      loading = false;
+      timeoutError = true;
+      error = true;
+    }, 1000);
   });
 
   function formatTime(dateString: string): string {
@@ -160,7 +181,7 @@
       <div class="flex items-center space-x-2">
         <button
           on:click={toggleDirection}
-          class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all"
+          class="hover:cursor-pointer flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all"
         >
           <ArrowUpDownIcon class="h-4 w-4 text-blue-400" />
           <span class="text-xs font-mono text-blue-300">
@@ -170,18 +191,32 @@
         <button
           on:click={loadSchedule}
           disabled={loading}
-          class="p-1 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all disabled:opacity-50"
+          class="hover:cursor-pointer p-1 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all disabled:opacity-50"
         >
           <RefreshCwIcon class="h-3 w-3 text-blue-400 {loading ? 'animate-spin' : ''}" />
         </button>
       </div>
     </div>
 
-    {#if loading || Object.keys(schedules).length === 0}
+    {#if loading || (Object.keys(schedules).length === 0 && !timeoutError)}
       <div class="flex items-center justify-center py-8">
         <div class="text-center">
           <LoaderIcon class="h-6 w-6 text-blue-400 animate-spin mx-auto mb-2" />
           <p class="text-xs text-gray-400 font-mono">Chargement des horaires...</p>
+        </div>
+      </div>
+    {:else if timeoutError}
+      <div class="flex items-center justify-center py-8">
+        <div class="text-center">
+          <p class="text-xs text-yellow-400 font-mono mb-2">
+            Le chargement prend plus de temps que prévu
+          </p>
+          <button
+            on:click={loadSchedule}
+            class="hover:cursor-pointer px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all text-sm font-mono text-blue-300"
+          >
+            Réessayer
+          </button>
         </div>
       </div>
     {:else if error}
@@ -190,7 +225,7 @@
           <p class="text-xs text-red-400 font-mono mb-2">Erreur de chargement</p>
           <button
             on:click={loadSchedule}
-            class="text-xs text-blue-400 font-mono hover:text-blue-300 transition-colors"
+            class="hover:cursor-pointer px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all text-sm font-mono text-blue-300"
           >
             Réessayer
           </button>
