@@ -89,7 +89,7 @@
         const key = `${bus.noParcours}-${bus.noArret}-${bus.codeDirection}`;
         try {
           const schedule = await getBusSchedule(bus.noParcours, bus.noArret, bus.codeDirection);
-          console.log(schedule);
+
           // Vérifier si les horaires sont valides
           if (schedule && schedule.horaires && Array.isArray(schedule.horaires)) {
             return { key, schedule };
@@ -124,12 +124,12 @@
   }
 
   onMount(() => {
-    loadSchedule();
+    /* loadSchedule();
 
     // Rafraîchir chaque 3 minutes
     const interval = setInterval(loadSchedule, 180000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); */
   });
 
   function formatTime(dateString: string): string {
