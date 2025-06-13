@@ -89,6 +89,7 @@
         const key = `${bus.noParcours}-${bus.noArret}-${bus.codeDirection}`;
         try {
           const schedule = await getBusSchedule(bus.noParcours, bus.noArret, bus.codeDirection);
+          console.log(schedule);
           // Vérifier si les horaires sont valides
           if (schedule && schedule.horaires && Array.isArray(schedule.horaires)) {
             return { key, schedule };
@@ -111,7 +112,6 @@
           schedules[key] = schedule;
         }
       });
-
       lastUpdated = new Date();
     } catch (e) {
       console.error('Erreur lors du chargement des horaires:', e);
