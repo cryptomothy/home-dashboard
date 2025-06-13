@@ -1,6 +1,6 @@
 // Liste des IPs autorisées
 const ALLOWED_IPS = [
-  '198.58.233.16', // localhost
+  import.meta.env.VITE_LOCAL_IP, // localhost
   // Ajoutez ici vos IPs autorisées
 ];
 
@@ -26,7 +26,7 @@ export async function getClientIp(): Promise<string> {
     throw new Error('Aucun service IP disponible');
   } catch (error) {
     console.error("Erreur lors de la récupération de l'IP:", error);
-    return '198.58.233.16'; // Fallback sur localhost en cas d'erreur
+    return import.meta.env.VITE_LOCAL_IP; // Fallback sur localhost en cas d'erreur
   }
 }
 
