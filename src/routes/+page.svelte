@@ -13,7 +13,7 @@
 
   import { Settings2Icon } from 'lucide-svelte';
 
-  let hasAccess = true;
+  let hasAccess = false;
   let loading = true;
   let ip = '';
   let showSettings = false;
@@ -57,8 +57,8 @@
   ];
 
   onMount(async () => {
-    /* ip = await getClientIp();
-    hasAccess = await checkAccess(); */
+    ip = await getClientIp();
+    hasAccess = await checkAccess();
 
     setTimeout(() => {
       loading = false;

@@ -144,18 +144,12 @@
   }
 
   onMount(() => {
-    /* loadSchedule();
+    loadSchedule();
 
     // Rafraîchir chaque 3 minutes
     const interval = setInterval(loadSchedule, 180000);
 
-    return () => clearInterval(interval); */
-
-    setTimeout(() => {
-      loading = false;
-      timeoutError = true;
-      error = true;
-    }, 1000);
+    return () => clearInterval(interval);
   });
 
   function formatTime(dateString: string): string {

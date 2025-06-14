@@ -102,7 +102,7 @@
       </div>
 
       <!-- Liste des todos -->
-      <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+      <div class="space-y-2 max-h-[300px] overflow-y-auto">
         {#each todos as todo (todo.id)}
           <div
             class="flex items-center space-x-2 p-2 bg-purple-500/10 rounded-lg border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer"
