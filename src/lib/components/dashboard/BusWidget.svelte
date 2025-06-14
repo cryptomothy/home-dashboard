@@ -95,7 +95,12 @@
       const schedulePromises = buses.map(async (bus) => {
         const key = `${bus.noParcours}-${bus.noArret}-${bus.codeDirection}`;
         try {
-          const schedule = await getBusSchedule(bus.noParcours, bus.noArret, bus.codeDirection);
+          const schedule = await getBusSchedule(
+            bus.noParcours,
+            bus.noArret,
+            bus.codeDirection,
+            formatDate(new Date()),
+          );
 
           // Vérifier si les horaires sont valides
           if (schedule && schedule.horaires && Array.isArray(schedule.horaires)) {
@@ -164,6 +169,14 @@
 
   function getBusKey(bus: (typeof buses)[0]): string {
     return `${bus.noParcours}-${bus.noArret}-${bus.codeDirection}`;
+  }
+
+  function formatDate(date: Date): string {
+    return (
+      date.getFullYear().toString() +
+      (date.getMonth() + 1).toString().padStart(2, '0') +
+      date.getDate().toString().padStart(2, '0')
+    );
   }
 
   function toggleDirection() {

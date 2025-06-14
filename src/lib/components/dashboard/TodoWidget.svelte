@@ -65,7 +65,7 @@
   }
 </script>
 
-<div class="col-span-2 row-span-2 glassmorphism rounded-2xl overflow-hidden tech-glow-purple">
+<div class="col-span-3 row-span-2 glassmorphism rounded-2xl overflow-hidden tech-glow-purple">
   <div class="p-3 flex flex-col">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center space-x-2">
@@ -105,23 +105,24 @@
       <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
         {#each todos as todo (todo.id)}
           <div
-            class="group flex items-center space-x-2 p-2 bg-purple-500/10 rounded-lg border border-purple-500/30 hover:bg-purple-500/20 transition-all"
+            class="flex items-center space-x-2 p-2 bg-purple-500/10 rounded-lg border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer"
+            on:click={() => toggleTodo(todo.id)}
           >
-            <button on:click={() => toggleTodo(todo.id)} class="flex-shrink-0">
+            <div class="flex-shrink-0">
               {#if todo.completed}
                 <CheckCircle2Icon class="h-4 w-4 text-green-400" />
               {:else}
                 <CircleIcon class="h-4 w-4 text-purple-400" />
               {/if}
-            </button>
+            </div>
             <span
               class="flex-1 text-sm {todo.completed ? 'text-gray-500 line-through' : 'text-white'}"
             >
               {todo.text}
             </span>
             <button
-              on:click={() => deleteTodo(todo.id)}
-              class="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-purple-500/30 transition-all"
+              on:click|stopPropagation={() => deleteTodo(todo.id)}
+              class="p-1 rounded-lg hover:bg-purple-500/30 transition-all"
             >
               <Trash2Icon class="h-3 w-3 text-red-400" />
             </button>

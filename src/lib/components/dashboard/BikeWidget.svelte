@@ -60,7 +60,7 @@
   }
 </script>
 
-<div class="col-span-3 row-span-2 glassmorphism rounded-2xl overflow-hidden tech-glow-cyan">
+<div class="col-span-2 row-span-2 glassmorphism rounded-2xl overflow-hidden tech-glow-cyan">
   <div class="p-3 flex flex-col">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center space-x-2">
