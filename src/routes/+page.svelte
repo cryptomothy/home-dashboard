@@ -6,17 +6,17 @@
   import NewsWidget from '$lib/components/dashboard/NewsWidget.svelte';
   import HackerNewsWidget from '$lib/components/dashboard/HackerNewsWidget.svelte';
   import AccessDenied from '$lib/components/AccessDenied.svelte';
-  import { checkAccess, getClientIp } from '$lib/services/ipRestrictionService';
+  import { checkAccess, getAccessStatus } from '$lib/services/ipRestrictionService';
   import BusWidget from '$lib/components/dashboard/BusWidget.svelte';
   import TodoWidget from '$lib/components/dashboard/TodoWidget.svelte';
-  import EventsWidget from '$lib/components/dashboard/EventsWidget.svelte';
+  import BonjourQuebecWidget from '$lib/components/dashboard/BonjourQuebecWidget.svelte';
   import WidgetSettingsModal from '$lib/components/WidgetSettingsModal.svelte';
 
   import { Settings2Icon } from 'lucide-svelte';
 
   let hasAccess = false;
   let loading = true;
-  let ip = '';
+  let accessMessage = '';
   let showSettings = false;
 
   let availableWidgets = [
@@ -41,9 +41,9 @@
       component: BusWidget,
     },
     {
-      name: 'events',
+      name: 'bonjourQuebec',
       active: true,
-      component: EventsWidget,
+      component: BonjourQuebecWidget,
     },
     {
       name: 'crypto',
@@ -63,8 +63,9 @@
   ];
 
   onMount(async () => {
-    ip = await getClientIp();
-    hasAccess = await checkAccess();
+    const accessStatus = await getAccessStatus();
+    hasAccess = accessStatus.allowed;
+    accessMessage = accessStatus.message;
 
     setTimeout(() => {
       loading = false;
@@ -100,7 +101,7 @@
     </div>
   </div>
 {:else if !hasAccess}
-  <AccessDenied {ip} />
+  <AccessDenied message={accessMessage} />
 {:else}
   <div class="min-h-screen overflow-hidden relative">
     <div class="relative z-10 h-full p-4">

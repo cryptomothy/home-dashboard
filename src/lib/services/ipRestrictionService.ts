@@ -1,38 +1,36 @@
-// Liste des IPs autorisées
-const ALLOWED_IPS = [
-  import.meta.env.VITE_LOCAL_IP, // localhost
-  // Ajoutez ici vos IPs autorisées
-];
+// Service de vérification d'IP sécurisé
+// Toute la logique de vérification se fait côté serveur
 
-// Fonction pour vérifier si une IP est autorisée
-export function isIpAllowed(ip: string): boolean {
-  return ALLOWED_IPS.includes(ip);
-}
-
-// Fonction pour obtenir l'IP du client
-export async function getClientIp(): Promise<string> {
+// Fonction pour vérifier l'accès via l'API sécurisée
+export async function checkAccess(): Promise<boolean> {
   try {
-    // Utilisation de plusieurs services pour plus de fiabilité
-    const responses = await Promise.allSettled([fetch('https://api.ipify.org?format=json')]);
+    const response = await fetch('/api/ip-check');
 
-    // Parcourir les réponses pour trouver la première qui fonctionne
-    for (const response of responses) {
-      if (response.status === 'fulfilled') {
-        const data = await response.value.json();
-        return data.ip || data;
-      }
+    if (!response.ok) {
+      console.error('Erreur lors de la vérification IP:', response.status);
+      return false;
     }
 
-    throw new Error('Aucun service IP disponible');
+    const data = await response.json();
+    return data.allowed;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'IP:", error);
-    return import.meta.env.VITE_LOCAL_IP; // Fallback sur localhost en cas d'erreur
+    console.error("Erreur lors de la vérification d'accès:", error);
+    return false;
   }
 }
 
-// Fonction pour vérifier l'accès
-export async function checkAccess(): Promise<boolean> {
-  const clientIp = await getClientIp();
-  console.log('IP du client:', clientIp); // Pour le débogage
-  return isIpAllowed(clientIp);
+// Fonction pour obtenir le statut d'accès avec plus de détails
+export async function getAccessStatus(): Promise<{ allowed: boolean; message: string }> {
+  try {
+    const response = await fetch('/api/ip-check');
+
+    if (!response.ok) {
+      return { allowed: false, message: 'Erreur de connexion' };
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur lors de la vérification d'accès:", error);
+    return { allowed: false, message: 'Erreur de connexion' };
+  }
 }

@@ -12,6 +12,8 @@
     CloudRainIcon,
     CloudSnowIcon,
     LoaderIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
   } from 'lucide-svelte';
   import { weatherService, type WeatherData } from '$lib/services/weatherService';
 
@@ -20,6 +22,7 @@
   let loading = true;
   let error = false;
   let lastUpdated = new Date();
+  let showTomorrowDetails = false;
 
   // Charger les données météo au montage du composant
   onMount(() => {
@@ -176,14 +179,17 @@
           <h4 class="text-xs font-mono text-cyan-300 mb-2 uppercase tracking-wider">Demain</h4>
 
           <!-- Résumé de demain -->
-          <div class="bg-cyan-500/10 rounded-lg border border-cyan-500/30 p-2 mb-2">
+          <button
+            on:click={() => (showTomorrowDetails = !showTomorrowDetails)}
+            class="w-full bg-cyan-500/10 rounded-lg border border-cyan-500/30 p-2 mb-2 hover:bg-cyan-500/20 transition-colors"
+          >
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <svelte:component
                   this={getWeatherIcon(weatherData.tomorrow.icon)}
                   class="h-4 w-4 text-cyan-400"
                 />
-                <div>
+                <div class="flex flex-col items-start">
                   <p class="text-xs font-mono text-white capitalize">
                     {weatherData.tomorrow.condition}
                   </p>
@@ -192,20 +198,27 @@
                   </p>
                 </div>
               </div>
-              <div class="text-right">
-                <div class="flex items-center space-x-1">
-                  <span class="text-sm font-mono font-bold text-white"
-                    >{weatherData.tomorrow.high}°</span
-                  >
-                  <span class="text-xs font-mono text-gray-400">/{weatherData.tomorrow.low}°</span>
+              <div class="flex items-center space-x-2">
+                <div class="text-right">
+                  <div class="flex items-center space-x-1">
+                    <span class="text-sm font-mono font-bold text-white"
+                      >{weatherData.tomorrow.high}°</span
+                    >
+                    <span class="text-xs font-mono text-gray-400">/{weatherData.tomorrow.low}°</span
+                    >
+                  </div>
                 </div>
+                <svelte:component
+                  this={showTomorrowDetails ? ChevronUpIcon : ChevronDownIcon}
+                  class="h-3 w-3 text-cyan-400"
+                />
               </div>
             </div>
-          </div>
+          </button>
 
           <!-- Prévisions horaires pour demain -->
-          {#if weatherData.tomorrow.hourly && weatherData.tomorrow.hourly.length > 0}
-            <div class="grid grid-cols-5 gap-1 max-h-40 overflow-y-auto">
+          {#if showTomorrowDetails && weatherData.tomorrow.hourly && weatherData.tomorrow.hourly.length > 0}
+            <div class="grid grid-cols-5 gap-1 max-h-40 overflow-y-auto pr-1">
               {#each weatherData.tomorrow.hourly as forecast}
                 <div
                   class="text-center p-1.5 bg-cyan-500/5 rounded-lg border border-cyan-500/20 hover:bg-cyan-500/10 transition-colors"
@@ -238,3 +251,24 @@
     {/if}
   </div>
 </div>
+
+<style>
+  /* Scrollbar personnalisée */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 2px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 2px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+  }
+</style>
