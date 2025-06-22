@@ -9,6 +9,7 @@
   import { checkAccess, getClientIp } from '$lib/services/ipRestrictionService';
   import BusWidget from '$lib/components/dashboard/BusWidget.svelte';
   import TodoWidget from '$lib/components/dashboard/TodoWidget.svelte';
+  import EventsWidget from '$lib/components/dashboard/EventsWidget.svelte';
   import WidgetSettingsModal from '$lib/components/WidgetSettingsModal.svelte';
 
   import { Settings2Icon } from 'lucide-svelte';
@@ -38,6 +39,11 @@
       name: 'bus',
       active: true,
       component: BusWidget,
+    },
+    {
+      name: 'events',
+      active: true,
+      component: EventsWidget,
     },
     {
       name: 'crypto',
