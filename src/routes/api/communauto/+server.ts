@@ -1,6 +1,59 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+export const OPTIONS: RequestHandler = async () => {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+};
+
+// Fonction pour faire une requête avec retry
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3,
+): Promise<Response> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🚗 Tentative ${attempt}/${maxRetries} pour l'API Communauto`);
+
+      const response = await fetch(url, {
+        ...options,
+        // Ajouter un timeout pour éviter les requêtes qui traînent
+        signal: AbortSignal.timeout(15000), // 15 secondes de timeout
+      });
+
+      console.log(`🚗 Réponse reçue (tentative ${attempt}):`, response.status, response.statusText);
+
+      // Si c'est une erreur 421, on réessaie
+      if (response.status === 421 && attempt < maxRetries) {
+        console.log(`🚗 Erreur 421 détectée, nouvelle tentative dans 1 seconde...`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`🚗 Erreur lors de la tentative ${attempt}:`, error);
+
+      if (attempt === maxRetries) {
+        throw error;
+      }
+
+      // Attendre avant de réessayer
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+
+  throw new Error('Toutes les tentatives ont échoué');
+}
+
 export const GET: RequestHandler = async ({ url }) => {
   try {
     const cityId = url.searchParams.get('cityId') || '90';
@@ -30,17 +83,31 @@ export const GET: RequestHandler = async ({ url }) => {
       console.log('🚗 Paramètres géolocalisation:', geoParams.join(', '));
     }
 
-    const response = await fetch(apiUrl, {
+    console.log("🚗 URL de l'API Communauto:", apiUrl);
+
+    const response = await fetchWithRetry(apiUrl, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         'User-Agent': 'WalkiWorki/1.0',
+        Connection: 'close', // Forcer la fermeture de la connexion
+        'Cache-Control': 'no-cache',
+        Pragma: 'no-cache',
       },
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
+      const errorText = await response
+        .text()
+        .catch(() => "Impossible de lire le contenu de l'erreur");
+      console.error('🚗 Erreur HTTP détaillée:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        body: errorText,
+      });
+      throw new Error(`Erreur HTTP: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
@@ -58,10 +125,13 @@ export const GET: RequestHandler = async ({ url }) => {
   } catch (error) {
     console.error('🚗 Erreur proxy Communauto:', error);
 
+    // Retourner une réponse d'erreur plus détaillée
     return json(
       {
         error: 'Erreur lors de la récupération des véhicules Communauto',
         details: error instanceof Error ? error.message : 'Erreur inconnue',
+        timestamp: new Date().toISOString(),
+        url: url.toString(),
       },
       {
         status: 500,
