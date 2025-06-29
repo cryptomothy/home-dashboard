@@ -89,7 +89,6 @@ export const GET: RequestHandler = async ({ url }) => {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'Mozilla/5.0 (compatible; WalkiWorki/1.0)',
       },
     });
 
