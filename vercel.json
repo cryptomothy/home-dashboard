@@ -1,12 +1,4 @@
 {
-  "functions": {
-    "src/routes/api/communauto/+server.ts": {
-      "maxDuration": 30
-    },
-    "src/routes/api/communauto/test/+server.ts": {
-      "maxDuration": 15
-    }
-  },
   "headers": [
     {
       "source": "/api/communauto",
@@ -41,12 +33,6 @@
           "value": "Content-Type"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/communauto",
-      "destination": "/api/communauto"
     }
   ]
 } 
