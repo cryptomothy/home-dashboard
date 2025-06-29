@@ -87,6 +87,68 @@ class CommunautoService {
     }
   }
 
+  // Méthode pour tester l'API simple (sans géolocalisation)
+  async getVehiclesSimple(cityId: number = 90): Promise<CommunautoResponse> {
+    try {
+      console.log('🚗 Test API Communauto Simple...');
+
+      const response = await fetch(`/api/communauto/simple?cityId=${cityId}`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const data: CommunautoResponse = await response.json();
+
+      if ('error' in data && typeof data.error === 'string') {
+        throw new Error(data.error);
+      }
+
+      console.log(`🚗 API Simple: ${data.totalNbVehicles} véhicules récupérés`);
+      return data;
+    } catch (error) {
+      console.error('Erreur API Communauto Simple:', error);
+      throw error;
+    }
+  }
+
+  // Méthode pour tester l'API HTTP/1.1
+  async getVehiclesHTTP1(cityId: number = 90): Promise<CommunautoResponse> {
+    try {
+      console.log('🚗 Test API Communauto HTTP/1.1...');
+
+      const response = await fetch(`/api/communauto/http1?cityId=${cityId}`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const data: CommunautoResponse = await response.json();
+
+      if ('error' in data && typeof data.error === 'string') {
+        throw new Error(data.error);
+      }
+
+      console.log(`🚗 API HTTP/1.1: ${data.totalNbVehicles} véhicules récupérés`);
+      return data;
+    } catch (error) {
+      console.error('Erreur API Communauto HTTP/1.1:', error);
+      throw error;
+    }
+  }
+
   // Méthode pour obtenir les véhicules dans une zone géographique spécifique
   async getVehiclesInArea(
     cityId: number = 90,
@@ -194,6 +256,51 @@ class CommunautoService {
   clearCache(): void {
     this.cache = null;
     this.lastFetch = 0;
+  }
+
+  // Méthode pour tester toutes les versions de l'API
+  async testAllAPIs(cityId: number = 90): Promise<{
+    main: boolean;
+    simple: boolean;
+    http1: boolean;
+    details: any;
+  }> {
+    const results = {
+      main: false,
+      simple: false,
+      http1: false,
+      details: {} as any,
+    };
+
+    // Test API principale
+    try {
+      await this.getVehicles(cityId);
+      results.main = true;
+      results.details.main = 'OK';
+    } catch (error) {
+      results.details.main = error instanceof Error ? error.message : 'Erreur inconnue';
+    }
+
+    // Test API simple
+    try {
+      await this.getVehiclesSimple(cityId);
+      results.simple = true;
+      results.details.simple = 'OK';
+    } catch (error) {
+      results.details.simple = error instanceof Error ? error.message : 'Erreur inconnue';
+    }
+
+    // Test API HTTP/1.1
+    try {
+      await this.getVehiclesHTTP1(cityId);
+      results.http1 = true;
+      results.details.http1 = 'OK';
+    } catch (error) {
+      results.details.http1 = error instanceof Error ? error.message : 'Erreur inconnue';
+    }
+
+    console.log('🧪 Résultats des tests API Communauto:', results);
+    return results;
   }
 }
 
