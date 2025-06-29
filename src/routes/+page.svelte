@@ -10,6 +10,7 @@
   import BusWidget from '$lib/components/dashboard/BusWidget.svelte';
   import TodoWidget from '$lib/components/dashboard/TodoWidget.svelte';
   import BonjourQuebecWidget from '$lib/components/dashboard/BonjourQuebecWidget.svelte';
+  import MapWidget from '$lib/components/dashboard/MapWidget.svelte';
   import WidgetSettingsModal from '$lib/components/WidgetSettingsModal.svelte';
 
   import { Settings2Icon } from 'lucide-svelte';
@@ -39,6 +40,11 @@
       name: 'bus',
       active: true,
       component: BusWidget,
+    },
+    {
+      name: 'map',
+      active: true,
+      component: MapWidget,
     },
     {
       name: 'bonjourQuebec',
