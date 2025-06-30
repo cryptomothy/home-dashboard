@@ -176,7 +176,7 @@ export const communautoMapStyles: google.maps.MapTypeStyle[] = [
  * Configuration par défaut pour la carte
  */
 export const mapConfig = {
-  defaultZoom: 14,
+  defaultZoom: 15,
   disableDefaultUI: true,
   zoomControl: false,
   mapTypeControl: false,
