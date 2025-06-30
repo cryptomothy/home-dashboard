@@ -17,6 +17,7 @@
   let userLocation: { lat: number; lng: number } | null = null;
   let userMarker: google.maps.Marker | null = null;
   let homeMarker: google.maps.Marker | null = null;
+  let homeRadiusCircle: google.maps.Circle | null = null;
   let radiusCircle: google.maps.Circle | null = null;
   let showNearbyVehicles = false;
   let nearbyVehicles: CommunautoVehicle[] = [];
@@ -308,10 +309,10 @@
     // Ajouter un cercle pour représenter le rayon de 1km
     radiusCircle = new google.maps.Circle({
       strokeColor: '#4285F4',
-      strokeOpacity: 0.3,
-      strokeWeight: 2,
+      strokeOpacity: 0.6,
+      strokeWeight: 3,
       fillColor: '#4285F4',
-      fillOpacity: 0.1,
+      fillOpacity: 0.15,
       map: map,
       center: userLocation,
       radius: 1000, // 1km en mètres
@@ -408,12 +409,28 @@
         anchor: new google.maps.Point(16, 16),
       },
     });
+
+    // Ajouter un cercle pour représenter le rayon permanent de 1km autour de la maison
+    homeRadiusCircle = new google.maps.Circle({
+      strokeColor: '#8BC53F',
+      strokeOpacity: 0.4,
+      strokeWeight: 2,
+      fillColor: '#8BC53F',
+      fillOpacity: 0.1,
+      map: map,
+      center: defaultCenter,
+      radius: 1000, // 1km en mètres
+    });
   }
 
   function removeHomeMarker() {
     if (homeMarker) {
       homeMarker.setMap(null);
       homeMarker = null;
+    }
+    if (homeRadiusCircle) {
+      homeRadiusCircle.setMap(null);
+      homeRadiusCircle = null;
     }
   }
 
@@ -520,11 +537,11 @@
         <div bind:this={mapContainer} class="w-full h-full rounded-lg overflow-hidden"></div>
 
         <!-- Instructions d'utilisation -->
-        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
+        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
           <p class="text-xs text-gray-300 font-mono">
             {showNearbyVehicles
-              ? 'Véhicules dans un rayon de 1km de votre position'
-              : 'Véhicules dans un rayon de 1km (position par défaut)'}
+              ? 'Véhicules dans un rayon de 1km de votre position (cercle bleu)'
+              : 'Véhicules dans un rayon de 1km de la maison (cercle vert)'}
           </p>
         </div>
 
@@ -553,10 +570,28 @@
         {/if}
 
         <!-- Indicateur de position de la maison -->
-        <div class="absolute top-2 {userLocation && showNearbyVehicles ? 'right-2' : 'left-2'} bg-black/50 backdrop-blur-sm rounded-lg p-2">
+        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
           <div class="flex items-center space-x-2">
             <div class="w-2 h-2 bg-green-400 rounded-full"></div>
             <span class="text-xs text-gray-300 font-mono">Maison</span>
+          </div>
+        </div>
+
+        <!-- Légende de la carte -->
+        <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-yellow-600 rounded-full"></div>
+              <span class="text-xs text-gray-300 font-mono">Maison</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
+              <span class="text-xs text-gray-300 font-mono">Votre position</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+              <span class="text-xs text-gray-300 font-mono">Véhicules</span>
+            </div>
           </div>
         </div>
       </div>
