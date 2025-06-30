@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-vercel';
+import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -8,13 +8,10 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    // Utiliser l'adapter Vercel spécifique pour une meilleure compatibilité
-    adapter: adapter({
-      // Configuration pour éviter les problèmes HTTP/2
-      runtime: 'nodejs18.x',
-      // Forcer HTTP/1.1 si possible
-      external: ['restapifrontoffice.reservauto.net'],
-    }),
+    // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
+    // If your environment is not supported, or you settled on a specific environment, switch out the adapter.
+    // See https://svelte.dev/docs/kit/adapters for more information about adapters.
+    adapter: adapter(),
   },
 };
 
