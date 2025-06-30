@@ -70,7 +70,6 @@ export const GET: RequestHandler = async ({ url }) => {
 
     return json(data, {
       headers: {
-        'Cache-Control': 'public, max-age=30', // Cache de 30 secondes
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',
