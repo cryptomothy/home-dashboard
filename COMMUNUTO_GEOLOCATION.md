@@ -1,6 +1,6 @@
 # Fonctionnalité de Géolocalisation Communauto
 
-Cette fonctionnalité permet d'afficher les véhicules Communauto dans un rayon de 2km autour de votre position.
+Cette fonctionnalité permet d'afficher les véhicules Communauto dans un rayon de 1km autour de votre position.
 
 ## Comment ça fonctionne
 
@@ -15,11 +15,11 @@ L'API Communauto accepte les paramètres suivants pour filtrer les véhicules pa
 
 ### 2. Calcul du rayon
 
-Pour afficher les véhicules dans un rayon de 2km :
+Pour afficher les véhicules dans un rayon de 1km :
 
-1. **Calcul de la zone rectangulaire** : On calcule une zone rectangulaire qui englobe le cercle de 2km
+1. **Calcul de la zone rectangulaire** : On calcule une zone rectangulaire qui englobe le cercle de 1km
 2. **Requête à l'API** : On envoie les coordonnées de cette zone à l'API Communauto
-3. **Filtrage précis** : On filtre ensuite les résultats pour ne garder que les véhicules dans le rayon exact de 2km
+3. **Filtrage précis** : On filtre ensuite les résultats pour ne garder que les véhicules dans le rayon exact de 1km
 
 ### 3. Utilisation dans l'interface
 
@@ -27,7 +27,7 @@ Dans le widget carte Communauto :
 
 - Cliquez sur le bouton **Navigation** (icône de boussole) pour activer la recherche par proximité
 - L'application demandera l'autorisation d'accéder à votre géolocalisation
-- Un cercle bleu de 2km sera affiché autour de votre position
+- Un cercle bleu de 1km sera affiché autour de votre position
 - Seuls les véhicules dans ce rayon seront affichés
 - Les distances sont calculées et affichées dans les tooltips des marqueurs
 
@@ -38,7 +38,7 @@ Dans le widget carte Communauto :
 Calcule les coordonnées d'une zone rectangulaire autour d'un point central.
 
 ```typescript
-const boundingBox = calculateBoundingBox(45.5017, -73.5673, 2);
+const boundingBox = calculateBoundingBox(45.5017, -73.5673, 1);
 // Retourne : { minLatitude, maxLatitude, minLongitude, maxLongitude }
 ```
 
@@ -66,7 +66,7 @@ const nearbyVehicles = await communautoService.getVehiclesInRadius(
   90, // cityId pour Montréal
   45.5017, // latitude du centre
   -73.5673, // longitude du centre
-  2, // rayon en km
+  1, // rayon en km
 );
 ```
 
@@ -76,12 +76,12 @@ const nearbyVehicles = await communautoService.getVehiclesInRadius(
 // 1. Obtenir la position de l'utilisateur
 const userLocation = await getUserLocation();
 
-// 2. Récupérer les véhicules dans un rayon de 2km
+// 2. Récupérer les véhicules dans un rayon de 1km
 const vehicles = await communautoService.getVehiclesInRadius(
   90, // Montréal
   userLocation.lat,
   userLocation.lng,
-  2, // 2km
+  1, // 1km
 );
 
 // 3. Afficher les véhicules sur la carte

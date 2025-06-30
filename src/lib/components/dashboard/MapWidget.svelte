@@ -186,9 +186,9 @@
         90, // cityId pour Montréal
         userLocation.lat,
         userLocation.lng,
-        2, // rayon de 2km
+        1, // rayon de 1km
       );
-      console.log(`🚗 ${nearbyVehicles.length} véhicules trouvés dans un rayon de 2km`);
+      console.log(`🚗 ${nearbyVehicles.length} véhicules trouvés dans un rayon de 1km`);
     } catch (err) {
       console.error('Erreur lors du chargement des véhicules à proximité:', err);
     } finally {
@@ -300,7 +300,7 @@
       },
     });
 
-    // Ajouter un cercle pour représenter le rayon de 2km
+    // Ajouter un cercle pour représenter le rayon de 1km
     radiusCircle = new google.maps.Circle({
       strokeColor: '#4285F4',
       strokeOpacity: 0.3,
@@ -309,7 +309,7 @@
       fillOpacity: 0.1,
       map: map,
       center: userLocation,
-      radius: 2000, // 2km en mètres
+      radius: 1000, // 1km en mètres
     });
 
     // Centrer la carte sur la position de l'utilisateur
@@ -347,10 +347,17 @@
     // Créer un SVG pour le marqueur Communauto
     const svg = `
       <svg width="151" height="151" viewBox="0 0 151 151" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="75.5" cy="75.5" r="75.5" fill="#109CFF"/>
-        <path d="M92.9717 76.3848C92.9717 87.1679 85.783 95.7686 74.8716 95.7686C64.0244 95.7686 56.7715 87.1679 56.7715 76.3848C56.7715 65.6018 63.9602 57.001 74.8716 57.001C85.783 57.001 92.9717 65.6018 92.9717 76.3848ZM67.5545 76.3848C67.5545 81.327 70.1861 85.4349 74.9358 85.4349C79.6855 85.4349 82.3171 81.327 82.3171 76.3848C82.3171 71.4426 79.6855 67.3347 74.9358 67.3347C70.1861 67.2706 67.5545 71.4426 67.5545 76.3848Z" fill="#8BC53F"/>
-        <path d="M75 106.359C58.2478 106.359 44.6406 92.7522 44.6406 76C44.6406 59.2478 58.2478 45.7048 75 45.7048C81.611 45.7048 87.7086 47.8229 92.715 51.4172V29.2092C87.1951 27.1553 81.2259 26 75 26C47.4005 26 25 48.4005 25 76C25 103.599 47.4005 126 75 126C81.2259 126 87.1951 124.845 92.715 122.791V100.647C87.7086 104.241 81.611 106.359 75 106.359Z" fill="#8BC53F"/>
+        <circle cx="75.4995" cy="75.5" r="75.5" fill="url(#paint0_linear_636_40)"/>
+        <path d="M92.9713 83.3848C92.9713 94.1679 85.7826 102.769 74.8711 102.769C64.0239 102.769 56.771 94.1679 56.771 83.3848C56.771 72.6018 63.9597 64.001 74.8711 64.001C85.7826 64.001 92.9713 72.6018 92.9713 83.3848ZM67.5541 83.3848C67.5541 88.327 70.1856 92.4349 74.9353 92.4349C79.685 92.4349 82.3166 88.327 82.3166 83.3848C82.3166 78.4426 79.685 74.3347 74.9353 74.3347C70.1856 74.2706 67.5541 78.4426 67.5541 83.3848Z" fill="#8BC53F"/>
+        <path d="M44.6405 85C44.6405 68.2478 58.2477 54.6406 75 54.6406C91.7522 54.6406 105.295 68.2478 105.295 85C105.295 91.611 103.177 97.7086 99.5828 102.715H121.791C123.845 97.1951 125 91.2259 125 85C125 57.4005 102.599 35 75 35C47.4005 35 25 57.4005 25 85C25 91.2259 26.1553 97.1951 28.2092 102.715H50.353C46.7587 97.7086 44.6405 91.611 44.6405 85Z" fill="#8BC53F"/>
+        <defs>
+          <linearGradient id="paint0_linear_636_40" x1="75.4995" y1="0" x2="75.4995" y2="151" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#0A5E99"/>
+            <stop offset="1" stop-color="#109CFF"/>
+          </linearGradient>
+        </defs>
       </svg>
+
     `;
 
     return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
@@ -404,10 +411,10 @@
         <button
           on:click={toggleNearbyVehicles}
           disabled={nearbyVehiclesLoading}
-          class="p-1 rounded-lg flex items-center justify-center bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all disabled:opacity-50 {showNearbyVehicles
+          class="p-1 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all disabled:opacity-50 {showNearbyVehicles
             ? 'bg-blue-500/40'
             : ''}"
-          title="Afficher les véhicules à proximité (2km)"
+          title="Afficher les véhicules à proximité (1km)"
         >
           <NavigationIcon
             class="h-3 w-3 text-blue-400 {nearbyVehiclesLoading ? 'animate-spin' : ''}"
@@ -463,7 +470,7 @@
         <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
           <p class="text-xs text-gray-300 font-mono">
             {showNearbyVehicles
-              ? 'Véhicules dans un rayon de 2km'
+              ? 'Véhicules dans un rayon de 1km'
               : 'Utilisez la souris pour naviguer'}
           </p>
         </div>

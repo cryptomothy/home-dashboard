@@ -148,7 +148,7 @@ Si l'API simple échoue, utilisez `/api/communauto/http1` qui force HTTP/1.1.
 
 #### 3. **Désactiver temporairement la géolocalisation**
 
-Testez sans les paramètres `MaxLatitude`, `MinLatitude`, etc.
+Testez sans les paramètres `MaxLatitude`, `MinLatitude`, etc. pour voir si le problème vient de la recherche par rayon de 1km.
 
 #### 4. **Vérifier la région Vercel**
 

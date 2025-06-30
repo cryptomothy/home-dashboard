@@ -1,7 +1,32 @@
 {
+  "functions": {
+    "src/routes/api/communauto/+server.ts": {
+      "maxDuration": 30
+    },
+    "src/routes/api/communauto/fallback/+server.ts": {
+      "maxDuration": 30
+    }
+  },
   "headers": [
     {
       "source": "/api/communauto",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type"
+        }
+      ]
+    },
+    {
+      "source": "/api/communauto/fallback",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
