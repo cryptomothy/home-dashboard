@@ -572,13 +572,13 @@
         <!-- Indicateur de position de la maison -->
         <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
           <div class="flex items-center space-x-2">
-            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+            <div class="w-2 h-2 bg-yellow-600 rounded-full"></div>
             <span class="text-xs text-gray-300 font-mono">Maison</span>
           </div>
         </div>
 
         <!-- Légende de la carte -->
-        <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
+        <!-- <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
           <div class="space-y-1">
             <div class="flex items-center space-x-2">
               <div class="w-3 h-3 bg-yellow-600 rounded-full"></div>
@@ -593,7 +593,7 @@
               <span class="text-xs text-gray-300 font-mono">Véhicules</span>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     {/if}
   </div>
