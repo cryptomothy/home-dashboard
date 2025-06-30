@@ -1,4 +1,5 @@
 import { calculateBoundingBox, calculateDistance } from '$lib/utils';
+import { PUBLIC_DEFAULT_LAT, PUBLIC_DEFAULT_LON } from '$env/static/public';
 
 export interface CommunautoVehicle {
   vehicleId: number;
@@ -36,6 +37,10 @@ class CommunautoService {
   private cache: CommunautoResponse | null = null;
   private lastFetch: number = 0;
   private cacheDuration = 30000; // 30 secondes
+  private defaultLocation = {
+    lat: parseFloat(PUBLIC_DEFAULT_LAT),
+    lng: parseFloat(PUBLIC_DEFAULT_LON),
+  };
 
   async getVehicles(cityId: number = 90): Promise<CommunautoResponse> {
     const now = Date.now();
@@ -47,9 +52,24 @@ class CommunautoService {
     }
 
     try {
-      console.log('🚗 Récupération des véhicules Communauto...');
+      console.log('🚗 Récupération des véhicules Communauto dans un rayon de 1km...');
 
-      const response = await fetch(`${this.baseUrl}?cityId=${cityId}`, {
+      // Calculer la zone de recherche autour de la position par défaut
+      const boundingBox = calculateBoundingBox(
+        this.defaultLocation.lat,
+        this.defaultLocation.lng,
+        1,
+      );
+
+      const params = new URLSearchParams({
+        cityId: cityId.toString(),
+        MaxLatitude: boundingBox.maxLatitude.toString(),
+        MinLatitude: boundingBox.minLatitude.toString(),
+        MaxLongitude: boundingBox.maxLongitude.toString(),
+        MinLongitude: boundingBox.minLongitude.toString(),
+      });
+
+      const response = await fetch(`${this.baseUrl}?${params}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -68,12 +88,37 @@ class CommunautoService {
         throw new Error(data.error);
       }
 
+      // Filtrer les véhicules pour ne garder que ceux dans le rayon exact de 1km
+      const vehiclesInRadius = data.vehicles.filter((vehicle) => {
+        if (!vehicle.vehicleLocation?.latitude || !vehicle.vehicleLocation?.longitude) {
+          return false;
+        }
+
+        const distance = calculateDistance(
+          this.defaultLocation.lat,
+          this.defaultLocation.lng,
+          vehicle.vehicleLocation.latitude,
+          vehicle.vehicleLocation.longitude,
+        );
+
+        return distance <= 1;
+      });
+
+      // Créer une nouvelle réponse avec les véhicules filtrés
+      const filteredResponse: CommunautoResponse = {
+        ...data,
+        vehicles: vehiclesInRadius,
+        totalNbVehicles: vehiclesInRadius.length,
+      };
+
       // Mettre en cache les données
-      this.cache = data;
+      this.cache = filteredResponse;
       this.lastFetch = now;
 
-      console.log(`🚗 ${data.totalNbVehicles} véhicules Communauto récupérés`);
-      return data;
+      console.log(
+        `🚗 ${vehiclesInRadius.length} véhicules Communauto récupérés dans un rayon de 1km`,
+      );
+      return filteredResponse;
     } catch (error) {
       console.error('Erreur lors de la récupération des véhicules Communauto:', error);
 
@@ -138,7 +183,7 @@ class CommunautoService {
     cityId: number = 90,
     centerLat: number,
     centerLng: number,
-    radiusKm: number = 2,
+    radiusKm: number = 1,
   ): Promise<CommunautoVehicle[]> {
     try {
       console.log(`🚗 Récupération des véhicules Communauto dans un rayon de ${radiusKm}km...`);
@@ -182,12 +227,8 @@ class CommunautoService {
   // Méthode pour obtenir seulement les véhicules avec leur localisation
   async getVehiclesWithLocation(cityId: number = 90): Promise<CommunautoVehicle[]> {
     const response = await this.getVehicles(cityId);
-    return response.vehicles.filter(
-      (vehicle) =>
-        vehicle.vehicleLocation &&
-        vehicle.vehicleLocation.latitude &&
-        vehicle.vehicleLocation.longitude,
-    );
+    // Les véhicules sont déjà filtrés par rayon de 1km et avec localisation dans getVehicles
+    return response.vehicles;
   }
 
   // Méthode pour vider le cache (utile pour forcer un refresh)

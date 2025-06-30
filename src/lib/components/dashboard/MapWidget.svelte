@@ -16,6 +16,7 @@
   let vehiclesLoading = false;
   let userLocation: { lat: number; lng: number } | null = null;
   let userMarker: google.maps.Marker | null = null;
+  let homeMarker: google.maps.Marker | null = null;
   let radiusCircle: google.maps.Circle | null = null;
   let showNearbyVehicles = false;
   let nearbyVehicles: CommunautoVehicle[] = [];
@@ -35,6 +36,7 @@
   onDestroy(() => {
     // Nettoyer les marqueurs
     clearMarkers();
+    removeHomeMarker();
     // Nettoyer la carte si elle existe
     if (map) {
       // Google Maps se nettoie automatiquement
@@ -235,6 +237,9 @@
     });
 
     console.log('🗺️ Carte initialisée avec succès');
+    
+    // Ajouter le marqueur de maison après l'initialisation de la carte
+    addHomeMarker();
   }
 
   function addVehicleMarkers() {
@@ -385,6 +390,54 @@
       await loadVehicles();
     }
   }
+
+  function addHomeMarker() {
+    if (!map) return;
+
+    // Supprimer le marqueur de maison existant
+    removeHomeMarker();
+
+    // Créer un marqueur pour la position de la maison
+    homeMarker = new google.maps.Marker({
+      position: defaultCenter,
+      map: map,
+      title: 'Maison',
+      icon: {
+        url: createHomeMarkerIcon(),
+        scaledSize: new google.maps.Size(32, 32),
+        anchor: new google.maps.Point(16, 16),
+      },
+    });
+  }
+
+  function removeHomeMarker() {
+    if (homeMarker) {
+      homeMarker.setMap(null);
+      homeMarker = null;
+    }
+  }
+
+  function createHomeMarkerIcon(): string {
+    // Créer un SVG pour le marqueur de maison
+    const svg = `
+      <svg width="75" height="75" viewBox="0 0 75 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="37.5" cy="37.5" r="37.5" fill="url(#paint0_linear_641_6)"/>
+        <path d="M22 32.4732C21.9999 31.9832 22.1056 31.499 22.3096 31.0546C22.5137 30.6101 22.8113 30.2159 23.1817 29.8996L34.8483 19.7958C35.45 19.2819 36.2123 19 37 19C37.7877 19 38.55 19.2819 39.1517 19.7958L50.8183 29.8996C51.1887 30.2159 51.4863 30.6101 51.6904 31.0546C51.8944 31.499 52.0001 31.9832 52 32.4732V47.6315C52 48.5249 51.6488 49.3817 51.0237 50.0134C50.3986 50.6451 49.5507 51 48.6667 51H25.3333C24.4493 51 23.6014 50.6451 22.9763 50.0134C22.3512 49.3817 22 48.5249 22 47.6315V32.4732Z" fill="url(#paint1_linear_641_6)" stroke="#B4810B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+        <linearGradient id="paint0_linear_641_6" x1="37.5" y1="0" x2="37.5" y2="75" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#4EB6FF"/>
+          <stop offset="1" stop-color="#2F6D99"/>
+        </linearGradient>
+        <linearGradient id="paint1_linear_641_6" x1="37" y1="19" x2="37" y2="51" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#4EB6FF"/>
+          <stop offset="1" stop-color="#2F6D99"/>
+        </linearGradient>
+        </defs>
+      </svg>
+    `;
+
+    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+  }
 </script>
 
 <div
@@ -403,7 +456,7 @@
           </span>
         {:else if vehicles.length > 0}
           <span class="text-xs text-green-400 font-mono bg-green-500/20 px-2 py-1 rounded">
-            {vehicles.length} véhicules
+            {vehicles.length} véhicules (rayon 1km)
           </span>
         {/if}
       </div>
@@ -414,7 +467,7 @@
           class="p-1 rounded-lg bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30 transition-all disabled:opacity-50 {showNearbyVehicles
             ? 'bg-blue-500/40'
             : ''}"
-          title="Afficher les véhicules à proximité (1km)"
+          title="Afficher les véhicules à proximité de votre position (1km)"
         >
           <NavigationIcon
             class="h-3 w-3 text-blue-400 {nearbyVehiclesLoading ? 'animate-spin' : ''}"
@@ -470,8 +523,8 @@
         <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
           <p class="text-xs text-gray-300 font-mono">
             {showNearbyVehicles
-              ? 'Véhicules dans un rayon de 1km'
-              : 'Utilisez la souris pour naviguer'}
+              ? 'Véhicules dans un rayon de 1km de votre position'
+              : 'Véhicules dans un rayon de 1km (position par défaut)'}
           </p>
         </div>
 
@@ -498,6 +551,14 @@
             </div>
           </div>
         {/if}
+
+        <!-- Indicateur de position de la maison -->
+        <div class="absolute top-2 {userLocation && showNearbyVehicles ? 'right-2' : 'left-2'} bg-black/50 backdrop-blur-sm rounded-lg p-2">
+          <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span class="text-xs text-gray-300 font-mono">Maison</span>
+          </div>
+        </div>
       </div>
     {/if}
   </div>
