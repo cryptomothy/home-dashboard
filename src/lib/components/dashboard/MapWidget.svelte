@@ -141,6 +141,7 @@
     try {
       vehiclesLoading = true;
       vehicles = await communautoService.getVehiclesWithLocation();
+      console.log(vehicles);
       console.log(`🚗 ${vehicles.length} véhicules Communauto chargés`);
     } catch (err) {
       console.error('Erreur lors du chargement des véhicules Communauto:', err);
@@ -238,7 +239,7 @@
     });
 
     console.log('🗺️ Carte initialisée avec succès');
-    
+
     // Ajouter le marqueur de maison après l'initialisation de la carte
     addHomeMarker();
   }
@@ -251,12 +252,12 @@
 
     vehiclesToShow.forEach((vehicle) => {
       const position = {
-        lat: vehicle.vehicleLocation.latitude,
-        lng: vehicle.vehicleLocation.longitude,
+        lat: vehicle.location.latitude,
+        lng: vehicle.location.longitude,
       };
 
       // Calculer la distance si on a la position de l'utilisateur
-      let title = `Véhicule #${vehicle.vehicleNb}`;
+      let title = `Véhicule #${vehicle.number}`;
       if (userLocation) {
         const distance = calculateDistance(
           userLocation.lat,
@@ -537,7 +538,9 @@
         <div bind:this={mapContainer} class="w-full h-full rounded-lg overflow-hidden"></div>
 
         <!-- Instructions d'utilisation -->
-        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
+        <div
+          class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-lg p-2"
+        >
           <p class="text-xs text-gray-300 font-mono">
             {showNearbyVehicles
               ? 'Véhicules dans un rayon de 1km de votre position (cercle bleu)'

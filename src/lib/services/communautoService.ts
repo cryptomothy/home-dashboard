@@ -2,22 +2,21 @@ import { calculateBoundingBox, calculateDistance } from '$lib/utils';
 import { PUBLIC_DEFAULT_LAT, PUBLIC_DEFAULT_LON } from '$env/static/public';
 
 export interface CommunautoVehicle {
-  vehicleId: number;
-  vehicleNb: number;
+  id: number;
+  number: number;
   cityId: number;
-  vehiclePropulsionTypeId: number;
-  vehicleTypeId: number;
-  vehicleBodyTypeId: number;
-  vehicleTransmissionTypeId: number;
-  vehicleTireTypeId: number;
-  vehiclePromotions: any[];
-  vehicleAccessories: number[];
-  vehicleLocation: {
+  location: {
     latitude: number;
     longitude: number;
   };
+  bodyTypeId: number;
+  typeId: number;
+  propulsionTypeId: number;
+  transmissionTypeId: number;
+  tireTypeId: number;
+  accessories: number[];
+  energyLevel: number | null;
   satisfiesFilters: boolean;
-  energyLevelPercentage: number | null;
   displayZone: boolean;
 }
 
@@ -90,15 +89,15 @@ class CommunautoService {
 
       // Filtrer les véhicules pour ne garder que ceux dans le rayon exact de 1km
       const vehiclesInRadius = data.vehicles.filter((vehicle) => {
-        if (!vehicle.vehicleLocation?.latitude || !vehicle.vehicleLocation?.longitude) {
+        if (!vehicle.location?.latitude || !vehicle.location?.longitude) {
           return false;
         }
 
         const distance = calculateDistance(
           this.defaultLocation.lat,
           this.defaultLocation.lng,
-          vehicle.vehicleLocation.latitude,
-          vehicle.vehicleLocation.longitude,
+          vehicle.location.latitude,
+          vehicle.location.longitude,
         );
 
         return distance <= 1;
@@ -202,15 +201,15 @@ class CommunautoService {
 
       // Filtrer les véhicules pour ne garder que ceux dans le rayon exact
       const vehiclesInRadius = response.vehicles.filter((vehicle) => {
-        if (!vehicle.vehicleLocation?.latitude || !vehicle.vehicleLocation?.longitude) {
+        if (!vehicle.location?.latitude || !vehicle.location?.longitude) {
           return false;
         }
 
         const distance = calculateDistance(
           centerLat,
           centerLng,
-          vehicle.vehicleLocation.latitude,
-          vehicle.vehicleLocation.longitude,
+          vehicle.location.latitude,
+          vehicle.location.longitude,
         );
 
         return distance <= radiusKm;

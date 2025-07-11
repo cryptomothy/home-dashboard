@@ -1,5 +1,55 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { XMLParser } from 'fast-xml-parser';
+
+// Fonction pour parser le XML Communauto et le transformer en JSON
+function parseCommunautoXML(xmlText: string) {
+  const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '@_',
+    textNodeName: '#text',
+    parseAttributeValue: true,
+    parseTagValue: true,
+  });
+
+  const result = parser.parse(xmlText);
+
+  // Extraire les données principales
+  const root = result.VehicleFreeFloatingAvailabilityListDTO;
+  const vehicles = root.Vehicles.VehicleFreeFloatingAvailabilityDTO;
+
+  // Transformer les véhicules en format plus simple
+  const transformedVehicles = Array.isArray(vehicles) ? vehicles : [vehicles];
+
+  const parsedData = {
+    totalNbVehicles: parseInt(root.TotalNbVehicles),
+    vehicles: transformedVehicles.map((vehicle: any) => ({
+      id: vehicle.VehicleId,
+      number: vehicle.VehicleNb,
+      cityId: vehicle.CityId,
+      location: {
+        latitude: vehicle.VehicleLocation.Latitude,
+        longitude: vehicle.VehicleLocation.Longitude,
+      },
+      bodyTypeId: vehicle.VehicleBodyTypeId,
+      typeId: vehicle.VehicleTypeId,
+      propulsionTypeId: vehicle.VehiclePropulsionTypeId,
+      transmissionTypeId: vehicle.VehicleTransmissionTypeId,
+      tireTypeId: vehicle.VehicleTireTypeId,
+      accessories: vehicle.VehicleAccessories?.int || [],
+      energyLevel: vehicle.EnergyLevelPercentage,
+      satisfiesFilters: vehicle.SatisfiesFilters,
+      displayZone: vehicle.DisplayZone,
+    })),
+    cachingInfo: {
+      durationInSec: root.CachingInfo.CachingDurationInSec,
+      servedFromCache: root.CachingInfo.ServedFromCache,
+      hashCode: root.CachingInfo.HashCode,
+    },
+  };
+
+  return parsedData;
+}
 
 export const OPTIONS: RequestHandler = async () => {
   return new Response(null, {
@@ -47,7 +97,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
-        Accept: 'application/json',
+        Accept: 'application/xml, application/json',
       },
     });
 
@@ -64,9 +114,22 @@ export const GET: RequestHandler = async ({ url }) => {
       throw new Error(`Erreur HTTP: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const contentType = response.headers.get('content-type');
+    let data;
 
-    console.log(`🚗 Proxy Communauto: ${data.totalNbVehicles} véhicules récupérés`);
+    if (contentType && contentType.includes('application/xml')) {
+      // Traitement du XML
+      const xmlText = await response.text();
+      console.log('🚗 Réponse XML reçue, longueur:', xmlText.length);
+
+      // Parser le XML et le transformer en JSON
+      data = parseCommunautoXML(xmlText);
+      console.log(`🚗 Proxy Communauto: ${data.totalNbVehicles} véhicules parsés depuis XML`);
+    } else {
+      // Traitement du JSON
+      data = await response.json();
+      console.log(`🚗 Proxy Communauto: ${data.totalNbVehicles || 'N/A'} véhicules récupérés`);
+    }
 
     return json(data, {
       headers: {

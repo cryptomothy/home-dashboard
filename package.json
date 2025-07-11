@@ -39,6 +39,7 @@
 		"bits-ui": "^2.6.0",
 		"clsx": "^2.1.1",
 		"dotenv": "^16.5.0",
+		"fast-xml-parser": "^5.2.5",
 		"lucide-svelte": "^0.514.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.4.0",
