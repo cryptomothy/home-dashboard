@@ -1,3 +1,5 @@
+import { PUBLIC_DEFAULT_LAT, PUBLIC_DEFAULT_LON } from '$env/static/public';
+
 // Types pour l'API OpenMeteo
 interface OpenMeteoCurrentResponse {
   current: {
@@ -149,8 +151,8 @@ class WeatherService {
   }
 
   async getCurrentWeather(
-    lat: number = 46.8139,
-    lon: number = -71.208,
+    lat: number = parseFloat(PUBLIC_DEFAULT_LAT),
+    lon: number = parseFloat(PUBLIC_DEFAULT_LON),
   ): Promise<WeatherData | null> {
     console.log('🌤️ Tentative de récupération des données météo avec OpenMeteo');
 

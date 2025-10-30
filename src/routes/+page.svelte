@@ -48,7 +48,7 @@
     },
     {
       name: 'bonjourQuebec',
-      active: true,
+      active: false,
       component: BonjourQuebecWidget,
     },
     {

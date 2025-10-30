@@ -32,10 +32,10 @@ export interface CommunautoResponse {
 }
 
 class CommunautoService {
-  private baseUrl = '/api/communauto'; // Utilise notre endpoint proxy
+  private baseUrl = '/api/communauto';
   private cache: CommunautoResponse | null = null;
   private lastFetch: number = 0;
-  private cacheDuration = 30000; // 30 secondes
+  private cacheDuration = 30000;
   private defaultLocation = {
     lat: parseFloat(PUBLIC_DEFAULT_LAT),
     lng: parseFloat(PUBLIC_DEFAULT_LON),
@@ -44,7 +44,6 @@ class CommunautoService {
   async getVehicles(cityId: number = 90): Promise<CommunautoResponse> {
     const now = Date.now();
 
-    // Vérifier si on a des données en cache et si elles sont encore valides
     if (this.cache && now - this.lastFetch < this.cacheDuration) {
       console.log('🚗 Données Communauto servies depuis le cache');
       return this.cache;
