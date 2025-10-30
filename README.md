@@ -6,6 +6,12 @@ A modern, customizable personal dashboard built with SvelteKit, featuring real-t
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)
 
+## 📸 Screenshot
+
+![Dashboard Screenshot](static/dashboard-screenshot.png)
+
+_The dashboard in action on a tablet, showing weather, todo list, bike availability, and transit schedules._
+
 ## 📱 About
 
 This dashboard is specifically designed to run on a **home tablet** (such as an iPad or Android tablet), providing an always-on information center for your household. The UI is optimized for tablet screens and includes features like real-time updates, an always-visible clock, and configurable widgets.
