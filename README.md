@@ -233,10 +233,6 @@ The built app will be in the `build/` directory. Deploy it to your preferred hos
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
-
-This project is private and proprietary.
-
 ## 🙏 Acknowledgments
 
 - Weather data provided by appropriate weather APIs
